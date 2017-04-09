@@ -1,23 +1,29 @@
 import threading
-import logging
-import settings
 from counter import Counter
 from Logger import stats_logger
 
+
 class TaskThread(threading.Thread):
-    """Thread that executes a task every N seconds"""
+    """
+    Thread that executes a task every N seconds
+    """
     stats = Counter()
+
     def __init__(self, interval):
         threading.Thread.__init__(self)
         self._finished = threading.Event()
         self._interval = interval
     
     def setInterval(self, interval):
-        """Set the number of seconds we sleep between executing our task"""
+        """
+        Set the number of seconds we sleep between executing our task
+        """
         self._interval = interval
     
     def shutdown(self):
-        """Stop this thread"""
+        """
+        Stop this thread
+        """
         self._finished.set()
     
     def run(self):
@@ -29,6 +35,9 @@ class TaskThread(threading.Thread):
             self._finished.wait(self._interval)
     
     def do_task(self):
+        """
+        Log the data processing statistics
+        """
         logData = self.stats.get_snapshot_restart()
 
         if logData is None:

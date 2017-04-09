@@ -26,7 +26,7 @@ handler1.setFormatter(formatter1)
 stats_logger.addHandler(handler1)
 logging.getLogger("pika").setLevel(logging.WARNING)
 
-
+"""
 TimeLog= logging.getLogger('TimeLogger')
 TimeLog.handlers = []
 TimeLog.setLevel(settings.TIME_LOG_LEVEL)
@@ -38,3 +38,4 @@ handler2 = logging.handlers.RotatingFileHandler(settings.Time_LOG_FILENAME,
 handler2.setFormatter(formatter2)
 TimeLog.addHandler(handler2)
 logging.getLogger("pika").setLevel(logging.WARNING)
+"""

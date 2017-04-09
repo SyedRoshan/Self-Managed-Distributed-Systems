@@ -1,7 +1,7 @@
 import os
-import logging, logging.handlers
 import time
 import datetime
+import logging,logging.handlers
 from multiprocessing import Lock
 
 SuccessMessageCount = 0
@@ -15,6 +15,9 @@ AverageParsingTimePerDoc = None
 
 
 class Counter(object):
+    """
+    Class to maintain statistics on number of message processed with its status (like success, failure)
+    """
     def __init__(self):
         self.lock = Lock()
         global SuccessMessageCount
@@ -104,7 +107,6 @@ class Counter(object):
 
     def get_time_log(self):
         response = None
-        #self.pause_stopwatch()
         totalmessagecount = SuccessMessageCount + FailureCount + EmptyMessageCount
 
         response = 'PostingStatus' + '|' + str(self.convert_datetime(HourStartTime)) + '|' + str(self.convert_datetime(time.time()))

@@ -1,7 +1,5 @@
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import random
-
 import logging,logging.handlers
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -10,10 +8,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 STATS_EVENT_TIME_SEC = 60
 
 THREAD_COUNT = 1
-PUBLISH_THREAD=1
-ACKNOWLEDGE_THREAD=1
+PUBLISH_THREAD = 1
+ACKNOWLEDGE_THREAD = 1
 
-BROKER_CONNECTION_TIMEOUT  = 10
+BROKER_CONNECTION_TIMEOUT = 10
 
 EXCHANGE_FAILED_POSTING = 'ExchangeFailedPosting'
 FAILED_POSTING_KEY = 'FailedPosting'
@@ -25,7 +23,7 @@ SUBSCRIBE_ROUTINGKEY = 'xml'
 PUBLISH_EXCHANGE = '0_Exchange_JSONResult'
 PUBLISH_ROUTINGKEY = 'json'
 
-#RabbitMQ server to get postings for classification
+#RabbitMQ server to get messages for data conversion
 INPUT_RABBIT = {'HOST': 'localhost',
                 'USER': 'test',
                 'PASSWORD': 'test',
@@ -34,7 +32,7 @@ INPUT_RABBIT = {'HOST': 'localhost',
                 'PORT': 5672,
                'VHOST':'/'}
 
-#RabbitMQ server to send postings destined for Nova
+#RabbitMQ server to send postings destined
 OUTPUT_RABBIT = {'HOST': 'localhost',
                'USER': 'test',
                'PASSWORD': 'test',
@@ -43,10 +41,10 @@ OUTPUT_RABBIT = {'HOST': 'localhost',
                'VHOST':'/',
                'PUB_CHANNEL_COUNT':1}
 
+#Log file path
 LogId = random.randrange(1000, 9999, 2)
 LOG_FILENAME = 'D:\\TestData\\0_NOVA\\Log\\DataConverter\\DataConverter_'+str(LogId)+'.log'
 STAT_LOG_FILENAME = 'D:\\TestData\\0_NOVA\\Log\\DataConverter\\DC_Status_'+str(LogId)+'.log'
-Time_LOG_FILENAME = 'D:\\TestData\\0_NOVA\\Log\\DataConverter\\DC_TIME_Status_'+str(LogId)+'.log'
 
 LOG_FORMAT = ('%(asctime)s|%(levelname)s|%(funcName)s| %(message)s')
 STATS_LOG_FORMAT = ('%(asctime)s|%(message)s')

@@ -2,9 +2,9 @@ import logging
 import time
 import pika
 import threading
-import json
-from sharedqueue import common, input_queue, publish_queue, acknowledge_queue
+
 import settings
+from sharedqueue import input_queue, publish_queue, acknowledge_queue
 
 mq_connection = None
 sub_channel = None
@@ -15,6 +15,9 @@ failed_routing_key = settings.FAILED_POSTING_KEY
 
 
 class Acknowledge(threading.Thread):
+    """
+    Acknowledge messages that are successfully processed and published
+    """
     ACKNOWLEDGE_CONTINUE = True
 
     def __init__(self, maxRetryTimeInSec):
@@ -23,14 +26,17 @@ class Acknowledge(threading.Thread):
         logging.info('Acknowledge initiated')
 
     def acknowledge_message(self):
+        """
+        Acknowledge message to subscribed channel
+        :return:
+        """
         while self.ACKNOWLEDGE_CONTINUE:
             data = None
             try:
                 data = acknowledge_queue.get()  # Without timeout will make thread to wait infinite until message available
 
-                if sub_channel is not None and sub_channel.is_open and data is not None and data[
-                    'deliveryTag'] is not None:
-
+                if sub_channel is not None and sub_channel.is_open and data is not None and \
+                                data['deliveryTag'] is not None:
                     if data.has_key('RequeueRejectStatus') and data['RequeueRejectStatus'] is not None:
                         sub_channel.basic_reject(delivery_tag=data['deliveryTag'], requeue=data['RequeueRejectStatus'])
                     else:
@@ -54,20 +60,17 @@ class Acknowledge(threading.Thread):
         self.acknowledge_message()
 
     def stop(self):
-        """Cleanly shutdown the connection to RabbitMQ by stopping the consumer
-        with RabbitMQ. When RabbitMQ confirms the cancellation, on_cancelok
-        will be invoked by pika, which will then closing the channel and
-        connection. The IOLoop is started again because this method is invoked
-        when CTRL-C is pressed raising a KeyboardInterrupt exception. This
-        exception stops the IOLoop which needs to be running for pika to
-        communicate with RabbitMQ. All of the commands issued prior to starting
-        the IOLoop will be buffered but not processed.
-
+        """
+        Disable ACKNOWLEDGE_CONTINUE to stop the loop
+        :return:
         """
         self.ACKNOWLEDGE_CONTINUE = False
 
 
 class Amqp_Subscriber(threading.Thread):
+    """
+    Establishes subscription connection with Rabbitmq
+    """
     SUBSCRIBE_CONTINUE = True
 
     def __init__(self, parameters, queue_name, prefetch, name='subscribe'):
@@ -77,10 +80,11 @@ class Amqp_Subscriber(threading.Thread):
         self.queue_name = queue_name
         self.prefetch = prefetch
 
-    def byteify(self, input):
-        return input
-
     def send_heartbeat_signal(self):
+        """
+        IOLoop initiated to send heartbeat signals to rabbitmq
+        :return:
+        """
         global mq_connection
         failcounter = 0
         try:
@@ -101,15 +105,32 @@ class Amqp_Subscriber(threading.Thread):
                 logging.error('IOloop error -' + e.message + ', FailRetry-' + str(failcounter))
 
     def initialize_connection(self):
+        """
+        Initialize rabbitmq connection to subscribe data
+        :return:
+        """
         global mq_connection
         implClassName = 'SelectConnection'
         name = self.name
 
         def setup_receiver(channel):
+            """
+            Initializes channel and binds call-back method to handle messages
+            :param channel:
+            :return:
+            """
             global sub_channel  # Initialize global connection so that message acknowledge can be done using other thread
             global mq_connection
             try:
                 def process_data(channel, method, properties, body):
+                    """
+                    Callback module which updates message to internal queue for processing
+                    :param channel:
+                    :param method:
+                    :param properties:
+                    :param body:
+                    :return:
+                    """
                     try:
                         input_queue.put({'ackMsg': True,
                                          'deliveryTag': method.delivery_tag,
