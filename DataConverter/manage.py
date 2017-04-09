@@ -13,7 +13,7 @@ from amqp_publisher import amqp_Publisher
 from dataConverter import DataConverter
 from amqp_subscriber import Amqp_Subscriber, Acknowledge
 from sharedqueue import input_queue, publish_queue, acknowledge_queue
-from Logger import event_logger, stats_logger, TimeLog  
+from Logger import event_logger
 
 acknowledge_Threads = []
 publish_Threads = []
