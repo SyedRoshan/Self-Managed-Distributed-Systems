@@ -41,9 +41,11 @@ class DataConverter:
 
                 if json_data is None:
                     self.failed_data(data, 'JSON parsing failed')
+                    stats.increment_failure()
                     stats.pause_stopwatch()
                     continue
 
+                stats.increment_success()
                 #Publish data
                 output_data_queue.put({'ackMsg': True,
                                    'deliveryTag': data['deliveryTag'],
@@ -64,7 +66,9 @@ class DataConverter:
                 else:
                     properties=DEFAULT_PROPERTIES
 
-                msg_action.requeue_internal_message(data, input_data_queue, maxRetryTimeInSec, properties, 'DATAERROR ; '+str(e.message))
+                if data is None:
+                    stats.increment_failure()
+                    msg_action.requeue_internal_message(data, input_data_queue, maxRetryTimeInSec, properties, 'DATAERROR ; '+str(e.message))
 
 
     def failed_data(self, data, exception_message):
